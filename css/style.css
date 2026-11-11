@@ -1,0 +1,1297 @@
+/* ==========================================================
+   КІНО ДЛЯ ТЕБЕ — особиста картотека переглянутого
+   Концепція: архів кримінальних справ.
+   Кожен фільм — папка-досьє на столі слідчого.
+   Оцінка — чорнильний штамп. Непереглянуте — «В РОЗШУКУ».
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@500;600&display=swap&subset=cyrillic');
+
+:root {
+  /* стіл слідчого */
+  --desk: #17120d;
+  --desk-edge: #221a12;
+  /* папери */
+  --paper: #e7dabc;
+  --paper-dark: #d9c9a4;
+  --paper-shadow: #b8a67e;
+  /* чорнила */
+  --ink: #2a2118;
+  --ink-soft: #5a4c3a;
+  --pencil: #8a7a63;
+  /* штампи */
+  --stamp-red: #a83226;
+  --stamp-blue: #2e4a6b;
+  --stamp-violet: #5b3e7a;
+  --stamp-green: #3e6b4a;
+  --stamp-pink: #b03a63;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background:
+    radial-gradient(ellipse at 50% -20%, #2a2015 0%, transparent 55%),
+    var(--desk);
+  color: var(--paper);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+}
+
+/* ---------- гриф секретності ---------- */
+
+.classification {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--stamp-red) 0 14px,
+    #8c281e 14px 28px
+  );
+  color: #f3e6d0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 7px 10px;
+  text-shadow: 0 1px 2px #00000055;
+}
+
+/* ---------- шапка ---------- */
+
+header {
+  padding: 44px 32px 28px;
+  border-bottom: 1px dashed #3a2f22;
+}
+
+.archive-label {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--pencil);
+  border: 1px solid var(--pencil);
+  padding: 4px 12px;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(34px, 6vw, 64px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: #efe3c8;
+}
+
+header h1 .stamped {
+  color: var(--stamp-red);
+  filter: brightness(1.25);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+header .sub {
+  margin-top: 14px;
+  color: var(--pencil);
+  font-size: 13px;
+  max-width: 640px;
+  line-height: 1.7;
+}
+
+/* статистика — картонні картки-роздільники */
+
+.stats {
+  display: flex;
+  gap: 14px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  background: linear-gradient(175deg, var(--paper) 0%, var(--paper-dark) 100%);
+  color: var(--ink);
+  border-radius: 2px;
+  padding: 10px 18px 12px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 2px 3px 0 #00000066;
+  position: relative;
+}
+
+.stat:nth-child(1) { transform: rotate(-0.6deg); }
+.stat:nth-child(3) { transform: rotate(0.5deg); }
+
+.stat strong {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--stamp-red);
+}
+
+/* ---------- стіна особливо важливих справ ---------- */
+
+.featured {
+  padding: 20px 32px 26px;
+  border-bottom: 1px dashed #3a2f22;
+  background:
+    radial-gradient(ellipse at 50% 120%, #2a2015aa 0%, transparent 60%),
+    repeating-linear-gradient(45deg, #1e1710 0 3px, #1a1309 3px 6px);
+}
+
+.featured-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.featured-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #efe3c8;
+}
+
+.featured-hint {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: #8a7a63;
+}
+
+.featured-strip {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  padding: 12px 4px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #4a3d2c transparent;
+}
+
+.featured-item {
+  flex-shrink: 0;
+  width: 92px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.featured-item .polaroid {
+  margin: 0 auto;
+  width: 76px;
+}
+
+.featured-item:nth-child(odd) .polaroid { transform: rotate(-3deg); }
+.featured-item:nth-child(even) .polaroid { transform: rotate(2.5deg); }
+.featured-item:nth-child(3n) .polaroid { transform: rotate(4deg); }
+
+.featured-item:hover { transform: translateY(-4px); }
+.featured-item:hover .polaroid { transform: rotate(0); }
+
+.fi-title {
+  margin-top: 8px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #d9c9a4;
+  line-height: 1.25;
+}
+
+.fi-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #d4564a;
+  border: 1.5px solid #a83226;
+  border-radius: 2px;
+  padding: 1px 6px;
+  transform: rotate(-2deg);
+}
+
+.fi-badge.fresh {
+  color: #6e8cb0;
+  border-color: var(--stamp-blue);
+  border-style: dashed;
+}
+
+/* ---------- панель: ящики картотеки ---------- */
+
+.controls {
+  padding: 18px 32px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, var(--desk-edge), var(--desk));
+  border-bottom: 2px solid #3a2f22;
+  box-shadow: 0 6px 18px #00000088;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid #4a3d2c;
+  color: #b8a67e;
+  padding: 7px 14px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover { border-color: var(--paper); color: var(--paper); }
+
+.tab.active {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 2px 2px 0 #00000088;
+}
+
+.random-btn {
+  border: 2px solid var(--stamp-red);
+  background: transparent;
+  color: #d4564a;
+  padding: 7px 16px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  transition: all 0.15s;
+}
+
+.random-btn:hover {
+  background: var(--stamp-red);
+  color: #f3e6d0;
+  box-shadow: 3px 3px 0 #00000088;
+}
+
+.sort-wrap select {
+  background: var(--desk-edge);
+  border: 1px solid #4a3d2c;
+  color: #b8a67e;
+  padding: 7px 10px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  outline: none;
+}
+
+.search-wrap { margin-left: auto; }
+
+.search-wrap input {
+  background: var(--desk-edge);
+  border: 1px solid #4a3d2c;
+  border-bottom: 2px solid #6a5a42;
+  color: var(--paper);
+  padding: 8px 14px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  width: 220px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-wrap input:focus { border-color: var(--paper); }
+.search-wrap input::placeholder { color: #6a5a42; }
+
+/* ---------- основна зона: стіл ---------- */
+
+main {
+  padding: 40px 32px 60px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--pencil);
+  margin: 6px 0 24px;
+}
+
+.decade-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 44px 0 26px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: #8a7a63;
+}
+
+.decade-label::before {
+  content: '▣';
+  color: var(--stamp-red);
+  font-size: 13px;
+}
+
+.decade-label::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px dashed #3a2f22;
+}
+
+/* ---------- сітка папок ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 34px 20px;
+  margin-bottom: 44px;
+}
+
+/* ---------- папка-досьє ---------- */
+
+.card {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, #00000006 3px 4px),
+    linear-gradient(172deg, var(--paper) 0%, var(--paper-dark) 100%);
+  color: var(--ink);
+  border-radius: 2px 6px 3px 3px;
+  padding: 18px 18px 16px;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 2px 4px 0 #00000077, 0 12px 24px #00000055;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* язичок папки з номером справи */
+.card::before {
+  content: 'СПРАВА № ' attr(data-case);
+  position: absolute;
+  top: -17px;
+  left: 10px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  padding: 3px 14px 2px;
+  border-radius: 4px 10px 0 0;
+  box-shadow: 2px -1px 0 #00000044;
+}
+
+/* легкий безлад на столі — папки лежать не ідеально */
+.card:nth-child(4n+1) { transform: rotate(-0.4deg); }
+.card:nth-child(4n+3) { transform: rotate(0.35deg); }
+
+.card:hover {
+  transform: translateY(-4px) rotate(0deg);
+  box-shadow: 3px 7px 0 #00000088, 0 18px 34px #00000077;
+  z-index: 2;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  line-height: 1.25;
+  flex: 1;
+}
+
+.year-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  border-bottom: 2px solid var(--ink-soft);
+  padding: 2px 1px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------- штампи оцінок ---------- */
+
+.stamp {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: 2.5px solid var(--stamp-red);
+  border-radius: 3px;
+  color: var(--stamp-red);
+  transform: rotate(-4deg);
+  opacity: 0.9;
+  margin: 2px 0 10px;
+  mix-blend-mode: multiply;
+}
+
+.stamp.legend {
+  border-width: 3px;
+  font-size: 14px;
+  transform: rotate(-6deg);
+  box-shadow: 0 0 0 1.5px var(--stamp-red) inset;
+}
+
+.stamp.wanted {
+  border-style: dashed;
+  border-color: var(--stamp-blue);
+  color: var(--stamp-blue);
+  transform: rotate(3deg);
+}
+
+/* ---------- печатки жанрів ---------- */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1.5px solid currentColor;
+  opacity: 0.75;
+  mix-blend-mode: multiply;
+}
+
+.tag.crime    { color: var(--stamp-red); }
+.tag.comedy   { color: #9a6a1e; }
+.tag.action   { color: var(--stamp-green); }
+.tag.thriller { color: var(--stamp-blue); }
+.tag.drama    { color: var(--stamp-violet); }
+.tag.heist    { color: #7a3e2a; }
+.tag.sport    { color: #2a6a6e; }
+.tag.horror   { color: #5a2a5e; }
+.tag.date     { color: var(--stamp-pink); border-style: dotted; }
+.tag.series   { color: var(--ink-soft); border-style: double; border-width: 3px; }
+
+/* рукописна нотатка */
+
+.card-desc {
+  font-family: 'Caveat', cursive;
+  font-size: 17.5px;
+  font-weight: 500;
+  color: #4a3c2c;
+  line-height: 1.35;
+  border-top: 1px dashed var(--paper-shadow);
+  padding-top: 8px;
+}
+
+/* ---------- банер побачень: рожевий стікер ---------- */
+
+.date-banner {
+  background: #e8c7d0;
+  color: #6e2a42;
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  padding: 14px 20px;
+  margin: 0 0 30px;
+  max-width: 560px;
+  transform: rotate(-0.8deg);
+  box-shadow: 2px 4px 0 #00000066;
+  border-radius: 2px;
+}
+
+.empty {
+  text-align: center;
+  padding: 70px 20px;
+  color: var(--pencil);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+/* ---------- досьє (модалка) ---------- */
+
+.dossier-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0c0906ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.dossier {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, #00000006 3px 4px),
+    linear-gradient(170deg, var(--paper) 0%, var(--paper-dark) 100%);
+  color: var(--ink);
+  border-radius: 2px 8px 3px 3px;
+  padding: 30px 30px 26px;
+  max-width: 560px;
+  width: 100%;
+  position: relative;
+  box-shadow: 4px 8px 0 #000000aa, 0 30px 70px #000000cc;
+  animation: slidein 0.22s ease;
+  margin: auto;
+}
+
+@keyframes slidein {
+  from { transform: translateY(14px) rotate(-0.5deg); opacity: 0; }
+  to   { transform: translateY(0) rotate(0); opacity: 1; }
+}
+
+.dossier .case-no {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+
+.dossier h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  padding-right: 84px;
+}
+
+.dossier .stamp {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  margin: 0;
+  transform: rotate(8deg);
+}
+
+.dossier table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+
+.dossier td {
+  padding: 6px 4px;
+  border-bottom: 1px dashed var(--paper-shadow);
+  vertical-align: top;
+}
+
+.dossier td:first-child {
+  width: 128px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.dossier .note {
+  font-family: 'Caveat', cursive;
+  font-size: 20px;
+  line-height: 1.35;
+  color: #4a3c2c;
+  margin-bottom: 20px;
+}
+
+.dossier .similar-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--stamp-red);
+  margin-bottom: 10px;
+}
+
+.similar-list { display: flex; flex-direction: column; gap: 6px; }
+
+.similar-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #00000009;
+  border: 1px dashed var(--paper-shadow);
+  padding: 8px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12.5px;
+  transition: background 0.15s;
+}
+
+.similar-item:hover { background: #00000014; }
+.similar-item .s-title { font-weight: 600; }
+.similar-item .s-meta { color: var(--ink-soft); font-size: 11px; white-space: nowrap; }
+
+.dossier .close-btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 11px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  transition: all 0.15s;
+}
+
+.dossier .close-btn:hover { background: var(--ink); color: var(--paper); }
+
+.dossier .redraw-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 2px dashed var(--stamp-red);
+  background: transparent;
+  color: var(--stamp-red);
+  transition: all 0.15s;
+}
+
+.dossier .redraw-btn:hover { background: var(--stamp-red); color: #f3e6d0; }
+
+/* ---------- фото-вещдок (полароїд) ---------- */
+
+.polaroid {
+  width: 64px;
+  flex-shrink: 0;
+  background: #f5f0e2;
+  padding: 4px 4px 2px;
+  box-shadow: 2px 3px 6px #00000066;
+  transform: rotate(3deg);
+  position: relative;
+}
+
+.polaroid .pin {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d4564a, #7a1f16);
+  box-shadow: 0 2px 3px #00000088;
+  z-index: 2;
+}
+
+.polaroid .ph-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
+  overflow: hidden;
+  position: relative;
+}
+
+.polaroid .ph-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: sepia(0.25) contrast(1.05);
+}
+
+.polaroid .ph-gen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  position: relative;
+}
+
+/* зерно плівки */
+.polaroid .ph-gen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, #ffffff08 2px 3px),
+    repeating-linear-gradient(90deg, transparent 0 3px, #00000014 3px 4px);
+  pointer-events: none;
+}
+
+.polaroid .ph-init {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #f3e6d0dd;
+  text-shadow: 0 1px 3px #00000088;
+}
+
+.polaroid .ph-year {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  color: #f3e6d088;
+  letter-spacing: 1px;
+}
+
+.polaroid .ph-caption {
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  text-align: center;
+  color: #4a3c2c;
+  padding: 1px 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.polaroid.big { width: 118px; transform: rotate(4deg); }
+.polaroid.big .ph-init { font-size: 34px; }
+.polaroid.big .ph-year { font-size: 10px; }
+.polaroid.big .ph-caption { font-size: 14px; }
+
+.dossier-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.dossier-head h2 { margin-bottom: 0; padding-right: 0; flex: 1; }
+
+/* ---------- кнопка трейлера ---------- */
+
+.trailer-btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 2px solid var(--stamp-blue);
+  color: var(--stamp-blue);
+  transition: all 0.15s;
+}
+
+.trailer-btn:hover { background: var(--stamp-blue); color: #f3e6d0; }
+
+/* ---------- кнопки інструментів ---------- */
+
+.tool-btn {
+  border: 2px solid var(--stamp-blue);
+  background: transparent;
+  color: #6e8cb0;
+  padding: 7px 14px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tool-btn:hover {
+  background: var(--stamp-blue);
+  color: #f3e6d0;
+  box-shadow: 3px 3px 0 #00000088;
+}
+
+/* ---------- дошка слідчого ---------- */
+
+.board-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%, #54402a 0%, transparent 60%),
+    repeating-linear-gradient(45deg, #3e2e1d 0 3px, #372818 3px 6px),
+    #372818;
+  box-shadow: inset 0 0 140px #000000cc;
+}
+
+.board-title {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  z-index: 5;
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #e7dabc;
+  text-shadow: 0 2px 4px #000000aa;
+}
+
+.board-title span {
+  display: block;
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  color: #b8a67e;
+  margin-top: 2px;
+}
+
+.board-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 5;
+  border: 2px solid #e7dabc;
+  background: #00000044;
+  color: #e7dabc;
+  padding: 8px 16px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.board-close:hover { background: #e7dabc; color: #372818; }
+
+.board-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.board-lines line {
+  stroke: #a83226;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 2px 2px #00000088);
+}
+
+.board-node {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+  width: 96px;
+}
+
+.board-node .polaroid { margin: 0 auto; transform: none; }
+.board-node.center { width: 150px; cursor: default; }
+
+.board-node:not(.center):hover {
+  transform: translate(-50%, -50%) rotate(0deg) scale(1.08);
+  z-index: 4;
+}
+
+.bn-title {
+  margin-top: 7px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #efe3c8;
+  text-shadow: 0 2px 3px #000000cc;
+  line-height: 1.2;
+}
+
+.board-node.center .bn-title { font-size: 14px; color: #ffefc9; }
+
+.bn-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #b8a67e;
+  margin-top: 2px;
+  text-shadow: 0 1px 2px #000000cc;
+}
+
+/* ---------- кінопрофіль ---------- */
+
+.dossier.profile { max-width: 620px; }
+
+.profile-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.profile-stats > div {
+  flex: 1;
+  min-width: 100px;
+  border: 1.5px dashed var(--paper-shadow);
+  border-radius: 2px;
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.profile-stats strong {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 24px;
+  color: var(--stamp-red);
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+}
+
+.bar-label {
+  width: 118px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.bar-track {
+  flex: 1;
+  height: 14px;
+  background: #00000010;
+  border: 1px solid var(--paper-shadow);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: repeating-linear-gradient(-45deg, var(--stamp-red) 0 6px, #8c281e 6px 12px);
+  opacity: 0.85;
+}
+
+.bar-val {
+  width: 30px;
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.profile-verdict {
+  margin-top: 20px;
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  color: #4a3c2c;
+  border-top: 1px dashed var(--paper-shadow);
+  padding-top: 12px;
+}
+
+/* ---------- вирок присяжного ---------- */
+
+.verdict-slot { margin-bottom: 20px; }
+
+.verdict-open-btn, .verdict-save-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 2px solid var(--stamp-green);
+  background: transparent;
+  color: var(--stamp-green);
+  transition: all 0.15s;
+}
+
+.verdict-open-btn:hover, .verdict-save-btn:hover {
+  background: var(--stamp-green);
+  color: #f3e6d0;
+}
+
+.verdict-box {
+  border: 1.5px dashed var(--stamp-green);
+  border-radius: 2px;
+  padding: 12px 14px;
+  position: relative;
+}
+
+.verdict-box .similar-title { color: var(--stamp-green); }
+
+.verdict-stamp {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border: 2.5px solid var(--stamp-green);
+  border-radius: 3px;
+  color: var(--stamp-green);
+  transform: rotate(-3deg);
+  mix-blend-mode: multiply;
+  margin-bottom: 8px;
+}
+
+.verdict-details { font-size: 12.5px; line-height: 1.7; }
+
+.verdict-note {
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  color: #4a3c2c;
+}
+
+.verdict-edit-btn, .verdict-delete-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--ink-soft);
+  background: transparent;
+  color: var(--ink-soft);
+  transition: all 0.15s;
+}
+
+.verdict-delete-btn { border-color: var(--stamp-red); color: var(--stamp-red); margin-left: 6px; }
+.verdict-edit-btn:hover { background: var(--ink-soft); color: var(--paper); }
+.verdict-delete-btn:hover { background: var(--stamp-red); color: #f3e6d0; }
+
+.verdict-form {
+  border: 1.5px dashed var(--stamp-green);
+  border-radius: 2px;
+  padding: 14px;
+}
+
+.verdict-form .similar-title { color: var(--stamp-green); }
+
+.vf-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 12px 0 6px;
+}
+
+.score-row { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.score-btn {
+  width: 34px;
+  height: 32px;
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.score-btn:hover { border-color: var(--stamp-green); color: var(--stamp-green); }
+
+.score-btn.picked {
+  background: var(--stamp-green);
+  border-color: var(--stamp-green);
+  color: #f3e6d0;
+  transform: rotate(-4deg);
+}
+
+.rewatch-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.quick-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 3px 0;
+  line-height: 1.4;
+}
+
+.quick-opt input { accent-color: var(--stamp-green); margin-top: 2px; cursor: pointer; }
+
+.verdict-text {
+  width: 100%;
+  min-height: 56px;
+  resize: vertical;
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 2px;
+  background: #ffffff44;
+  color: var(--ink);
+  font-family: 'Caveat', cursive;
+  font-size: 17px;
+  padding: 8px 10px;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.verdict-text:focus { border-color: var(--stamp-green); }
+
+/* ---------- завести справу / про архів ---------- */
+
+.add-input {
+  width: 100%;
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 2px;
+  background: #ffffff44;
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+}
+
+.add-input:focus { border-color: var(--stamp-green); }
+
+.tag-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 2px 10px;
+}
+
+.add-flags { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+
+.destroy-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 2px dashed var(--stamp-red);
+  background: transparent;
+  color: var(--stamp-red);
+  transition: all 0.15s;
+}
+
+.destroy-btn:hover { background: var(--stamp-red); color: #f3e6d0; }
+
+.tool-btn.add-btn { border-color: var(--stamp-green); color: #5a9a6e; }
+.tool-btn.add-btn:hover { background: var(--stamp-green); color: #f3e6d0; }
+
+.changelog div {
+  display: flex;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--paper-shadow);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.changelog span {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  color: var(--stamp-red);
+  flex-shrink: 0;
+  width: 38px;
+}
+
+/* ---------- футер ---------- */
+
+footer {
+  padding: 30px 32px 40px;
+  border-top: 1px dashed #3a2f22;
+  color: #6a5a42;
+  font-size: 11.5px;
+  text-align: center;
+  line-height: 2;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- мобілка ---------- */
+
+@media (max-width: 640px) {
+  header { padding: 28px 16px 22px; }
+  main { padding: 30px 16px 40px; }
+  .featured { padding: 16px 16px 20px; }
+  /* панель на телефоні: один рядок з горизонтальною прокруткою */
+  .controls {
+    padding: 12px 16px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .search-wrap { margin-left: 0; }
+  .search-wrap input { width: 170px; }
+  .grid { gap: 30px 14px; }
+  .dossier h2 { padding-right: 0; }
+  .dossier-head { flex-direction: row; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

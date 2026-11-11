@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кіно для тебе — особиста картотека переглянутого</title>
+  <meta name="description" content="Особистий каталог фільмів у вигляді архіву справ: оцінки-штампи, фільтри, пошук, схожі фільми і рулетка «що глянути».">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="classification">Цілком суб'єктивно · допуск: всі, кому цікаво · Цілком суб'єктивно</div>
+
+<header>
+  <div class="archive-label">Особистий архів · заведено 2025 р.</div>
+  <h1>Кіно для тебе:<br>картотека <span class="stamped">переглянутого</span></h1>
+  <p class="sub">Кожен фільм тут — окрема справа: з номером, штампом вироку і рукописною нотаткою.
+  Те, що я ще не подивився, оголошено в розшук. Натискай на папку — відкриється повне досьє зі схожими справами.</p>
+  <div class="stats">
+    <div class="stat"><strong id="total-count">—</strong>справ у архіві</div>
+    <div class="stat"><strong id="avg-rating">—</strong>середній вирок</div>
+    <div class="stat"><strong id="tens-count">—</strong>справ на 10/10</div>
+  </div>
+</header>
+
+<section class="featured">
+  <div class="featured-head">
+    <span class="featured-title">⭐ Особливо важливі справи</span>
+    <span class="featured-hint">вироки 10/10 і свіжі надходження — клікай, відкриється досьє</span>
+  </div>
+  <div class="featured-strip" id="featured-strip"></div>
+</section>
+
+<div class="controls">
+  <button class="tab active" onclick="filter('all', this)">Весь архів</button>
+  <button class="tab" onclick="filter('classic', this)">Класика</button>
+  <button class="tab" onclick="filter('90s', this)">90-ті</button>
+  <button class="tab" onclick="filter('00s', this)">00-ті</button>
+  <button class="tab" onclick="filter('10s', this)">10-ті</button>
+  <button class="tab" onclick="filter('20s', this)">20-ті</button>
+  <button class="tab" onclick="filter('crime', this)">Кримінал</button>
+  <button class="tab" onclick="filter('heist', this)">Пограбування</button>
+  <button class="tab" onclick="filter('comedy', this)">Комедії</button>
+  <button class="tab" onclick="filter('action', this)">Екшн</button>
+  <button class="tab" onclick="filter('thriller', this)">Трилери</button>
+  <button class="tab" onclick="filter('series', this)">Серіали</button>
+  <button class="tab" onclick="filter('date', this)">💘 Побачення</button>
+  <button class="tab" onclick="filter('planned', this)">В розшуку</button>
+  <button class="random-btn" onclick="randomFilm()">🎲 Витягнути справу</button>
+  <button class="tool-btn" onclick="openBoard()">🧵 Дошка слідчого</button>
+  <button class="tool-btn" onclick="openProfile()">📊 Кінопрофіль</button>
+  <button class="tool-btn add-btn" onclick="openAddForm()">➕ Завести справу</button>
+  <button class="tool-btn" onclick="openAbout()">ℹ Про архів</button>
+  <div class="sort-wrap">
+    <select onchange="setSort(this.value)">
+      <option value="default">Порядок: за епохами</option>
+      <option value="rating">За моїм вироком</option>
+      <option value="year">За роком (нові зверху)</option>
+      <option value="title">За назвою (А-Я)</option>
+    </select>
+  </div>
+  <div class="search-wrap">
+    <input type="text" placeholder="Пошук по архіву..." oninput="search(this.value)" id="searchInput">
+  </div>
+</div>
+
+<main id="main-content"></main>
+
+<footer>
+  Кіно для тебе · архіваріус: Лучников Іван, група 316 · ХТУ «ШАГ» · проєктно-технологічна практика<br>
+  Всі вироки остаточні й оскарженню не підлягають. Так, «Проект X» отримав 12/10 — готовий захищати це на дипломі.
+</footer>
+
+<script src="js/films.js"></script>
+<script src="js/custom.js"></script>
+<script src="js/verdicts.js"></script>
+<script src="js/app.js"></script>
+<script src="js/posters.js"></script>
+</body>
+</html>
